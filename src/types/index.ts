@@ -31,6 +31,10 @@ export interface MenuItem {
   // Computed effective price (calculated in the app)
   effectivePrice?: number;
   isOnDiscount?: boolean;
+  // Measurement fields
+  measurementValue?: number;
+  measurementUnit?: string;
+  showMeasurement?: boolean;
 }
 
 export interface CartItem extends MenuItem {
@@ -44,12 +48,9 @@ export interface OrderData {
   items: CartItem[];
   customerName: string;
   contactNumber: string;
-  serviceType: 'dine-in' | 'pickup' | 'delivery';
+  serviceType: 'pickup' | 'delivery';
   address?: string;
   pickupTime?: string;
-  // Dine-in specific fields
-  partySize?: number;
-  dineInTime?: string;
   paymentMethod: 'gcash' | 'maya' | 'bank-transfer';
   referenceNumber?: string;
   total: number;
@@ -57,7 +58,7 @@ export interface OrderData {
 }
 
 export type PaymentMethod = 'gcash' | 'maya' | 'bank-transfer';
-export type ServiceType = 'dine-in' | 'pickup' | 'delivery';
+export type ServiceType = 'pickup' | 'delivery';
 
 // Site Settings Types
 export interface SiteSetting {
@@ -74,4 +75,9 @@ export interface SiteSettings {
   site_description: string;
   currency: string;
   currency_code: string;
+  // Delivery Settings
+  store_lat: number;
+  store_lng: number;
+  delivery_rate_base: number;
+  delivery_rate_per_km: number;
 }

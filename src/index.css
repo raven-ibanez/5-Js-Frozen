@@ -2,14 +2,32 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Ramen Yard Custom Styles */
-/* Minimal helpers for ramen palette when needed outside tailwind tokens */
-.bg-ramen-cream { background-color: #FFF3E0; }
-.bg-ramen-beige { background-color: #F7E7CE; }
-.text-ramen-red { color: #D7263D; }
-.text-ramen-dark { color: #0B0A0A; }
-.border-ramen-sesame { border-color: #D1C7B7; }
-.ring-ramen-gold { --tw-ring-color: #E0A106; }
+/* 5J's Frozen Custom Styles */
+/* Helpers for meatshop palette */
+.bg-meat-light {
+  background-color: #FDFBF7;
+  /* cream-50 */
+}
+
+.bg-meat-red {
+  background-color: #D92323;
+}
+
+.text-meat-red {
+  color: #E02424;
+}
+
+.text-meat-dark {
+  color: #0B0A0A;
+}
+
+.border-meat-gray {
+  border-color: #374151;
+}
+
+.ring-meat-gold {
+  --tw-ring-color: #F59E0B;
+}
 
 /* Hide scrollbar for mobile nav */
 .scrollbar-hide {

@@ -1,8 +1,8 @@
 import React from 'react';
 import { MenuItem, CartItem } from '../types';
 import { useCategories } from '../hooks/useCategories';
-import MenuItemCard from './MenuItemCard';
-import MobileNav from './MobileNav';
+import MenuSection from './MenuSection';
+
 
 // Preload images for better performance
 const preloadImages = (items: MenuItem[]) => {
@@ -31,7 +31,7 @@ const Menu: React.FC<MenuProps> = ({ menuItems, addToCart, cartItems, updateQuan
       // Preload images for visible category first
       const visibleItems = menuItems.filter(item => item.category === activeCategory);
       preloadImages(visibleItems);
-      
+
       // Then preload other images after a short delay
       setTimeout(() => {
         const otherItems = menuItems.filter(item => item.category !== activeCategory);
@@ -40,21 +40,7 @@ const Menu: React.FC<MenuProps> = ({ menuItems, addToCart, cartItems, updateQuan
     }
   }, [menuItems, activeCategory]);
 
-  const handleCategoryClick = (categoryId: string) => {
-    setActiveCategory(categoryId);
-    const element = document.getElementById(categoryId);
-    if (element) {
-      const headerHeight = 64; // Header height
-      const mobileNavHeight = 60; // Mobile nav height
-      const offset = headerHeight + mobileNavHeight + 20; // Extra padding
-      const elementPosition = element.offsetTop - offset;
-      
-      window.scrollTo({
-        top: elementPosition,
-        behavior: 'smooth'
-      });
-    }
-  };
+
 
   React.useEffect(() => {
     if (categories.length > 0) {
@@ -87,48 +73,41 @@ const Menu: React.FC<MenuProps> = ({ menuItems, addToCart, cartItems, updateQuan
 
   return (
     <>
-      <MobileNav 
-        activeCategory={activeCategory}
-        onCategoryClick={handleCategoryClick}
-      />
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <div className="text-center mb-12">
-        <h2 className="text-4xl font-noto font-semibold text-black mb-4">Our Menu</h2>
-        <p className="text-gray-600 max-w-2xl mx-auto">
-          Discover our selection of authentic dim sum, flavorful noodles, and traditional Asian dishes, 
-          all prepared with fresh ingredients and authentic techniques.
-        </p>
-      </div>
 
-      {categories.map((category) => {
-        const categoryItems = menuItems.filter(item => item.category === category.id);
-        
-        if (categoryItems.length === 0) return null;
-        
-        return (
-          <section key={category.id} id={category.id} className="mb-16">
-            <div className="flex items-center mb-8">
-              <span className="text-3xl mr-3">{category.icon}</span>
-              <h3 className="text-3xl font-noto font-medium text-black">{category.name}</h3>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {categoryItems.map((item) => {
-                const cartItem = cartItems.find(cartItem => cartItem.id === item.id);
-                return (
-                  <MenuItemCard
-                    key={item.id}
-                    item={item}
-                    onAddToCart={addToCart}
-                    quantity={cartItem?.quantity || 0}
-                    onUpdateQuantity={updateQuantity}
-                  />
-                );
-              })}
-            </div>
-          </section>
-        );
-      })}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="text-center mb-12 hidden">
+          <h2 className="text-4xl font-display font-bold text-meat-dark mb-4">Our Menu</h2>
+          <p className="text-gray-600 max-w-2xl mx-auto">
+            Discover our premium selection of frozen steaks, ground meat, and specialty cuts,
+            perfect for your next family gathering or barbecue event.
+          </p>
+        </div>
+
+        {categories
+          .filter(c => !c.parent_id) // Filter for main categories
+          .map((category) => {
+            const subcategories = categories.filter(sub => sub.parent_id === category.id);
+
+            // Get all items for this main category (direct + subcategory items)
+            const subcategoryIds = subcategories.map(sub => sub.id);
+            const allCategoryItems = menuItems.filter(item =>
+              item.category === category.id || subcategoryIds.includes(item.category)
+            );
+
+            if (allCategoryItems.length === 0) return null;
+
+            return (
+              <MenuSection
+                key={category.id}
+                category={category}
+                subcategories={subcategories}
+                items={allCategoryItems}
+                cartItems={cartItems}
+                addToCart={addToCart}
+                updateQuantity={updateQuantity}
+              />
+            );
+          })}
       </main>
     </>
   );

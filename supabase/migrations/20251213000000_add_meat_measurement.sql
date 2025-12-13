@@ -1,0 +1,4 @@
+ALTER TABLE menu_items 
+ADD COLUMN IF NOT EXISTS measurement_value DECIMAL(10,2),
+ADD COLUMN IF NOT EXISTS measurement_unit TEXT,
+ADD COLUMN IF NOT EXISTS show_measurement BOOLEAN DEFAULT false;

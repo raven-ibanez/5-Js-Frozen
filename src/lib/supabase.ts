@@ -56,7 +56,12 @@ export type Database = {
           discount_end_date: string | null;
           discount_active: boolean;
           created_at: string;
+          discount_active: boolean;
+          created_at: string;
           updated_at: string;
+          measurement_value: number | null;
+          measurement_unit: string | null;
+          show_measurement: boolean;
         };
         Insert: {
           id?: string;
@@ -73,6 +78,9 @@ export type Database = {
           discount_active?: boolean;
           created_at?: string;
           updated_at?: string;
+          measurement_value?: number | null;
+          measurement_unit?: string | null;
+          show_measurement?: boolean;
         };
         Update: {
           id?: string;
@@ -89,6 +97,9 @@ export type Database = {
           discount_active?: boolean;
           created_at?: string;
           updated_at?: string;
+          measurement_value?: number | null;
+          measurement_unit?: string | null;
+          show_measurement?: boolean;
         };
       };
       variations: {

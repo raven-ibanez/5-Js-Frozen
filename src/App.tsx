@@ -1,54 +1,81 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useSearchParams } from 'react-router-dom';
 import { useCart } from './hooks/useCart';
 import Header from './components/Header';
-import SubNav from './components/SubNav';
+import Hero from './components/Hero';
 import Menu from './components/Menu';
 import Cart from './components/Cart';
 import Checkout from './components/Checkout';
 import FloatingCartButton from './components/FloatingCartButton';
 import AdminDashboard from './components/AdminDashboard';
+import LandingPage from './components/LandingPage';
 import { useMenu } from './hooks/useMenu';
+import { useCategories } from './hooks/useCategories';
 
 function MainApp() {
+  const [searchParams] = useSearchParams();
   const cart = useCart();
   const { menuItems } = useMenu();
+  const { categories } = useCategories();
   const [currentView, setCurrentView] = React.useState<'menu' | 'cart' | 'checkout'>('menu');
   const [selectedCategory, setSelectedCategory] = React.useState<string>('all');
+
+  // Initialize from URL params
+  React.useEffect(() => {
+    const categoryParam = searchParams.get('category');
+    if (categoryParam) {
+      setSelectedCategory(categoryParam);
+    }
+
+    const viewParam = searchParams.get('view');
+    if (viewParam === 'cart') {
+      setCurrentView('cart');
+    }
+  }, [searchParams]);
 
   const handleViewChange = (view: 'menu' | 'cart' | 'checkout') => {
     setCurrentView(view);
   };
 
-  const handleCategoryClick = (categoryId: string) => {
-    setSelectedCategory(categoryId);
-  };
 
-  // Filter menu items based on selected category
-  const filteredMenuItems = selectedCategory === 'all' 
-    ? menuItems 
-    : menuItems.filter(item => item.category === selectedCategory);
+
+  // Filter menu items based on selected category (including subcategories)
+  const filteredMenuItems = React.useMemo(() => {
+    if (selectedCategory === 'all') return menuItems;
+
+    // Get all subcategory IDs for the selected category
+    const subcategoryIds = categories
+      .filter(c => c.parent_id === selectedCategory)
+      .map(c => c.id);
+
+    return menuItems.filter(item =>
+      item.category === selectedCategory || subcategoryIds.includes(item.category)
+    );
+  }, [selectedCategory, menuItems, categories]);
 
   return (
-    <div className="min-h-screen bg-cream-50 font-inter">
-      <Header 
+    <div className="min-h-screen bg-meat-light font-sans">
+      <Header
         cartItemsCount={cart.getTotalItems()}
         onCartClick={() => handleViewChange('cart')}
         onMenuClick={() => handleViewChange('menu')}
       />
-      <SubNav selectedCategory={selectedCategory} onCategoryClick={handleCategoryClick} />
-      
+
+      {/* Show Hero only in menu view */}
+      {currentView === 'menu' && <Hero />}
+
+
       {currentView === 'menu' && (
-        <Menu 
+        <Menu
           menuItems={filteredMenuItems}
           addToCart={cart.addToCart}
           cartItems={cart.cartItems}
           updateQuantity={cart.updateQuantity}
         />
       )}
-      
+
       {currentView === 'cart' && (
-        <Cart 
+        <Cart
           cartItems={cart.cartItems}
           updateQuantity={cart.updateQuantity}
           removeFromCart={cart.removeFromCart}
@@ -58,17 +85,17 @@ function MainApp() {
           onCheckout={() => handleViewChange('checkout')}
         />
       )}
-      
+
       {currentView === 'checkout' && (
-        <Checkout 
+        <Checkout
           cartItems={cart.cartItems}
           totalPrice={cart.getTotalPrice()}
           onBack={() => handleViewChange('cart')}
         />
       )}
-      
+
       {currentView === 'menu' && (
-        <FloatingCartButton 
+        <FloatingCartButton
           itemCount={cart.getTotalItems()}
           onCartClick={() => handleViewChange('cart')}
         />
@@ -81,7 +108,8 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<MainApp />} />
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/shop" element={<MainApp />} />
         <Route path="/admin" element={<AdminDashboard />} />
       </Routes>
     </Router>

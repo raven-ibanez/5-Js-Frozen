@@ -7,6 +7,7 @@ export interface Category {
   icon: string;
   sort_order: number;
   active: boolean;
+  parent_id?: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -19,7 +20,7 @@ export const useCategories = () => {
   const fetchCategories = async () => {
     try {
       setLoading(true);
-      
+
       const { data, error: fetchError } = await supabase
         .from('categories')
         .select('*')
@@ -47,7 +48,8 @@ export const useCategories = () => {
           name: category.name,
           icon: category.icon,
           sort_order: category.sort_order,
-          active: category.active
+          active: category.active,
+          parent_id: category.parent_id
         })
         .select()
         .single();
@@ -70,7 +72,8 @@ export const useCategories = () => {
           name: updates.name,
           icon: updates.icon,
           sort_order: updates.sort_order,
-          active: updates.active
+          active: updates.active,
+          parent_id: updates.parent_id
         })
         .eq('id', id);
 
