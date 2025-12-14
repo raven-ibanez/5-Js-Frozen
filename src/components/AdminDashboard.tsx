@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Trash2, Plus, Edit2, LogOut, Package, Grid, Settings, ArrowLeft, X, Save, Edit, Coffee, TrendingUp, Users, FolderOpen, CreditCard, Map } from 'lucide-react';
+import { Trash2, Plus, Edit2, LogOut, Package, Grid, Settings, ArrowLeft, X, Save, Edit, Coffee, TrendingUp, Users, FolderOpen, CreditCard, Map, Lock } from 'lucide-react';
 import { MenuItem, Variation, AddOn } from '../types';
 import { useMenu } from '../hooks/useMenu';
 import { useCategories } from '../hooks/useCategories';
