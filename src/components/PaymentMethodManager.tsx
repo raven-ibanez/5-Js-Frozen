@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, Edit, Trash2, Save, X, ArrowLeft, CreditCard, Upload } from 'lucide-react';
+import { Plus, Edit, Trash2, Save, X, ArrowLeft, CreditCard } from 'lucide-react';
 import { usePaymentMethods, PaymentMethod } from '../hooks/usePaymentMethods';
 import ImageUpload from './ImageUpload';
 
@@ -44,9 +44,9 @@ const PaymentMethodManager: React.FC<PaymentMethodManagerProps> = ({ onBack }) =
     setFormData({
       id: method.id,
       name: method.name,
-      account_number: method.account_number,
-      account_name: method.account_name,
-      qr_code_url: method.qr_code_url,
+      account_number: method.account_number || '',
+      account_name: method.account_name || '',
+      qr_code_url: method.qr_code_url || '',
       active: method.active,
       sort_order: method.sort_order
     });
@@ -64,8 +64,8 @@ const PaymentMethodManager: React.FC<PaymentMethodManagerProps> = ({ onBack }) =
   };
 
   const handleSaveMethod = async () => {
-    if (!formData.id || !formData.name || !formData.account_number || !formData.account_name || !formData.qr_code_url) {
-      alert('Please fill in all required fields');
+    if (!formData.id || !formData.name) {
+      alert('Please fill in Payment Method Name and ID');
       return;
     }
 
@@ -175,7 +175,7 @@ const PaymentMethodManager: React.FC<PaymentMethodManagerProps> = ({ onBack }) =
                   disabled={currentView === 'edit'}
                 />
                 <p className="text-xs text-gray-500 mt-1">
-                  {currentView === 'edit' 
+                  {currentView === 'edit'
                     ? 'Method ID cannot be changed after creation'
                     : 'Use kebab-case format (e.g., "gcash", "bank-transfer")'
                   }
@@ -183,10 +183,10 @@ const PaymentMethodManager: React.FC<PaymentMethodManagerProps> = ({ onBack }) =
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-black mb-2">Account Number/Phone *</label>
+                <label className="block text-sm font-medium text-black mb-2">Account Number/Phone (Optional)</label>
                 <input
                   type="text"
-                  value={formData.account_number}
+                  value={formData.account_number || ''}
                   onChange={(e) => setFormData({ ...formData, account_number: e.target.value })}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                   placeholder="09XX XXX XXXX or Account: 1234-5678-9012"
@@ -194,10 +194,10 @@ const PaymentMethodManager: React.FC<PaymentMethodManagerProps> = ({ onBack }) =
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-black mb-2">Account Name *</label>
+                <label className="block text-sm font-medium text-black mb-2">Account Name (Optional)</label>
                 <input
                   type="text"
-                  value={formData.account_name}
+                  value={formData.account_name || ''}
                   onChange={(e) => setFormData({ ...formData, account_name: e.target.value })}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                   placeholder="M&C Bakehouse"
@@ -274,7 +274,7 @@ const PaymentMethodManager: React.FC<PaymentMethodManagerProps> = ({ onBack }) =
         <div className="bg-white rounded-xl shadow-sm overflow-hidden">
           <div className="p-6">
             <h2 className="text-lg font-playfair font-medium text-black mb-4">Payment Methods</h2>
-            
+
             {paymentMethods.length === 0 ? (
               <div className="text-center py-8">
                 <CreditCard className="h-12 w-12 text-gray-400 mx-auto mb-4" />
@@ -295,14 +295,20 @@ const PaymentMethodManager: React.FC<PaymentMethodManagerProps> = ({ onBack }) =
                   >
                     <div className="flex items-center space-x-4">
                       <div className="flex-shrink-0">
-                        <img
-                          src={method.qr_code_url}
-                          alt={`${method.name} QR Code`}
-                          className="w-16 h-16 rounded-lg border border-gray-300 object-cover"
-                          onError={(e) => {
-                            e.currentTarget.src = 'https://images.pexels.com/photos/8867482/pexels-photo-8867482.jpeg?auto=compress&cs=tinysrgb&w=300&h=300&fit=crop';
-                          }}
-                        />
+                        {method.qr_code_url ? (
+                          <img
+                            src={method.qr_code_url}
+                            alt={`${method.name} QR Code`}
+                            className="w-16 h-16 rounded-lg border border-gray-300 object-cover"
+                            onError={(e) => {
+                              e.currentTarget.src = 'https://images.pexels.com/photos/8867482/pexels-photo-8867482.jpeg?auto=compress&cs=tinysrgb&w=300&h=300&fit=crop';
+                            }}
+                          />
+                        ) : (
+                          <div className="w-16 h-16 rounded-lg border border-gray-300 bg-gray-100 flex items-center justify-center text-gray-400">
+                            <CreditCard className="h-6 w-6" />
+                          </div>
+                        )}
                       </div>
                       <div>
                         <h3 className="font-medium text-black">{method.name}</h3>
@@ -311,23 +317,22 @@ const PaymentMethodManager: React.FC<PaymentMethodManagerProps> = ({ onBack }) =
                         <p className="text-xs text-gray-400">ID: {method.id} • Order: #{method.sort_order}</p>
                       </div>
                     </div>
-                    
+
                     <div className="flex items-center space-x-3">
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        method.active 
-                          ? 'bg-green-100 text-green-800' 
-                          : 'bg-red-100 text-red-800'
-                      }`}>
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${method.active
+                        ? 'bg-green-100 text-green-800'
+                        : 'bg-red-100 text-red-800'
+                        }`}>
                         {method.active ? 'Active' : 'Inactive'}
                       </span>
-                      
+
                       <button
                         onClick={() => handleEditMethod(method)}
                         className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded transition-colors duration-200"
                       >
                         <Edit className="h-4 w-4" />
                       </button>
-                      
+
                       <button
                         onClick={() => handleDeleteMethod(method.id)}
                         className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors duration-200"

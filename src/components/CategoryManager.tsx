@@ -69,19 +69,23 @@ const CategoryManager: React.FC<CategoryManagerProps> = ({ onBack }) => {
     }
 
     try {
+
+      const payload: any = { ...formData };
+      if (payload.parent_id === '') {
+        payload.parent_id = null;
+      }
+
       if (editingCategory) {
-        await updateCategory(editingCategory.id, formData);
+        await updateCategory(editingCategory.id, payload);
       } else {
-        if (formData.parent_id === '') {
-          // @ts-ignore
-          delete formData.parent_id;
-        }
-        await addCategory(formData);
+        await addCategory(payload);
       }
       setCurrentView('list');
       setEditingCategory(null);
     } catch (error) {
-      alert(error instanceof Error ? error.message : 'Failed to save category');
+      console.error('Full error object:', error);
+      const message = error instanceof Error ? error.message : (error as any)?.message || 'Failed to save category';
+      alert(message);
     }
   };
 
@@ -316,8 +320,8 @@ const CategoryManager: React.FC<CategoryManagerProps> = ({ onBack }) => {
 
                         <div className="flex items-center space-x-3">
                           <span className={`px-2 py-1 rounded-full text-xs font-medium ${category.active
-                              ? 'bg-green-100 text-green-800'
-                              : 'bg-red-100 text-red-800'
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-red-100 text-red-800'
                             }`}>
                             {category.active ? 'Active' : 'Inactive'}
                           </span>
@@ -361,8 +365,8 @@ const CategoryManager: React.FC<CategoryManagerProps> = ({ onBack }) => {
 
                             <div className="flex items-center space-x-3">
                               <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${subcategory.active
-                                  ? 'bg-green-100 text-green-800'
-                                  : 'bg-red-100 text-red-800'
+                                ? 'bg-green-100 text-green-800'
+                                : 'bg-red-100 text-red-800'
                                 }`}>
                                 {subcategory.active ? 'Active' : 'Inactive'}
                               </span>

@@ -41,16 +41,21 @@ export const useCategories = () => {
 
   const addCategory = async (category: Omit<Category, 'created_at' | 'updated_at'>) => {
     try {
+      const dbCategory: any = {
+        id: category.id,
+        name: category.name,
+        icon: category.icon,
+        sort_order: category.sort_order,
+        active: category.active
+      };
+
+      if (category.parent_id) {
+        dbCategory.parent_id = category.parent_id;
+      }
+
       const { data, error: insertError } = await supabase
         .from('categories')
-        .insert({
-          id: category.id,
-          name: category.name,
-          icon: category.icon,
-          sort_order: category.sort_order,
-          active: category.active,
-          parent_id: category.parent_id
-        })
+        .insert(dbCategory)
         .select()
         .single();
 
@@ -66,15 +71,16 @@ export const useCategories = () => {
 
   const updateCategory = async (id: string, updates: Partial<Category>) => {
     try {
+      const dbUpdates: any = {};
+      if (updates.name !== undefined) dbUpdates.name = updates.name;
+      if (updates.icon !== undefined) dbUpdates.icon = updates.icon;
+      if (updates.sort_order !== undefined) dbUpdates.sort_order = updates.sort_order;
+      if (updates.active !== undefined) dbUpdates.active = updates.active;
+      if (updates.parent_id !== undefined) dbUpdates.parent_id = updates.parent_id;
+
       const { error: updateError } = await supabase
         .from('categories')
-        .update({
-          name: updates.name,
-          icon: updates.icon,
-          sort_order: updates.sort_order,
-          active: updates.active,
-          parent_id: updates.parent_id
-        })
+        .update(dbUpdates)
         .eq('id', id);
 
       if (updateError) throw updateError;

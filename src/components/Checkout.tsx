@@ -170,7 +170,10 @@ ${serviceType === 'delivery' ? `🛵 Delivery Fee: ₱${deliveryFee}` : ''}
 💰 TOTAL AMOUNT: ₱${finalTotal}
 
 💳 Payment: ${selectedPaymentMethod?.name || paymentMethod}
-📸 Payment Screenshot: Please attach your payment receipt screenshot
+${(selectedPaymentMethod?.account_number || selectedPaymentMethod?.qr_code_url)
+        ? '📸 Payment Screenshot: Please attach your payment receipt screenshot'
+        : ''
+      }
 
 ${notes ? `📝 Notes: ${notes}` : ''}
 
@@ -442,7 +445,7 @@ Please confirm this order to proceed. Thank you for choosing 5J's Frozen! 🥟
           </div>
 
           {/* Payment Details with QR Code */}
-          {selectedPaymentMethod && (
+          {selectedPaymentMethod && (selectedPaymentMethod.account_number || selectedPaymentMethod.qr_code_url) ? (
             <div className="bg-red-50 rounded-lg p-6 mb-6">
               <h3 className="font-medium text-black mb-4">Payment Details</h3>
               <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
@@ -459,27 +462,40 @@ Please confirm this order to proceed. Thank you for choosing 5J's Frozen! 🥟
                   </div>
                 </div>
                 <div className="flex-shrink-0">
-                  <img
-                    src={selectedPaymentMethod.qr_code_url}
-                    alt={`${selectedPaymentMethod.name} QR Code`}
-                    className="w-32 h-32 rounded-lg border-2 border-red-300 shadow-sm"
-                    onError={(e) => {
-                      e.currentTarget.src = 'https://images.pexels.com/photos/8867482/pexels-photo-8867482.jpeg?auto=compress&cs=tinysrgb&w=300&h=300&fit=crop';
-                    }}
-                  />
-                  <p className="text-xs text-gray-500 text-center mt-2">Scan to pay</p>
+                  {selectedPaymentMethod.qr_code_url && (
+                    <>
+                      <img
+                        src={selectedPaymentMethod.qr_code_url}
+                        alt={`${selectedPaymentMethod.name} QR Code`}
+                        className="w-32 h-32 rounded-lg border-2 border-red-300 shadow-sm"
+                        onError={(e) => {
+                          e.currentTarget.src = 'https://images.pexels.com/photos/8867482/pexels-photo-8867482.jpeg?auto=compress&cs=tinysrgb&w=300&h=300&fit=crop';
+                        }}
+                      />
+                      <p className="text-xs text-gray-500 text-center mt-2">Scan to pay</p>
+                    </>
+                  )}
                 </div>
               </div>
+            </div>
+          ) : (
+            <div className="bg-gray-50 rounded-lg p-6 mb-6 text-center">
+              <h3 className="font-medium text-black mb-2">Cash on Delivery</h3>
+              <p className="text-gray-600">
+                Please prepare the exact amount of <span className="font-bold">₱{finalTotal}</span> for payment upon {serviceType === 'delivery' ? 'delivery' : 'pickup'}.
+              </p>
             </div>
           )}
 
           {/* Reference Number */}
-          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-            <h4 className="font-medium text-black mb-2">📸 Payment Proof Required</h4>
-            <p className="text-sm text-gray-700">
-              After making your payment, please take a screenshot of your payment receipt and attach it when you send your order via Messenger. This helps us verify and process your order quickly.
-            </p>
-          </div>
+          {selectedPaymentMethod && (selectedPaymentMethod.account_number || selectedPaymentMethod.qr_code_url) && (
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+              <h4 className="font-medium text-black mb-2">📸 Payment Proof Required</h4>
+              <p className="text-sm text-gray-700">
+                After making your payment, please take a screenshot of your payment receipt and attach it when you send your order via Messenger. This helps us verify and process your order quickly.
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Order Summary */}

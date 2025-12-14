@@ -51,13 +51,13 @@ export interface OrderData {
   serviceType: 'pickup' | 'delivery';
   address?: string;
   pickupTime?: string;
-  paymentMethod: 'gcash' | 'maya' | 'bank-transfer';
+  paymentMethod: PaymentMethod;
   referenceNumber?: string;
   total: number;
   notes?: string;
 }
 
-export type PaymentMethod = 'gcash' | 'maya' | 'bank-transfer';
+export type PaymentMethod = string;
 export type ServiceType = 'pickup' | 'delivery';
 
 // Site Settings Types

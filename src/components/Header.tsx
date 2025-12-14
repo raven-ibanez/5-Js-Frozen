@@ -1,5 +1,6 @@
 import React from 'react';
 import { ShoppingCart, Home } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useSiteSettings } from '../hooks/useSiteSettings';
 
 interface HeaderProps {
@@ -9,6 +10,7 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ cartItemsCount, onCartClick, onMenuClick }) => {
+  const navigate = useNavigate();
   const { siteSettings, loading } = useSiteSettings();
 
   return (
@@ -45,7 +47,7 @@ const Header: React.FC<HeaderProps> = ({ cartItemsCount, onCartClick, onMenuClic
 
           <div className="flex items-center space-x-4">
             <button
-              onClick={() => window.location.href = '/'}
+              onClick={() => navigate('/')}
               className="p-3 text-gray-600 hover:text-meat-red hover:bg-red-50 rounded-full transition-all duration-200 group"
               title="Back to Home"
             >
