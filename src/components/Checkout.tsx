@@ -44,9 +44,10 @@ interface CheckoutProps {
   cartItems: CartItem[];
   totalPrice: number;
   onBack: () => void;
+  onPlaceOrder: () => void;
 }
 
-const Checkout: React.FC<CheckoutProps> = ({ cartItems, totalPrice: itemsTotal, onBack }) => {
+const Checkout: React.FC<CheckoutProps> = ({ cartItems, totalPrice: itemsTotal, onBack, onPlaceOrder }) => {
   const { paymentMethods } = usePaymentMethods();
   const { settings } = useSettings();
   const [step, setStep] = useState<'details' | 'payment'>('details');
@@ -182,6 +183,9 @@ Please confirm this order to proceed. Thank you for choosing 5J's Frozen! 🥟
 
     const encodedMessage = encodeURIComponent(orderDetails);
     const messengerUrl = `https://m.me/61584534464621?text=${encodedMessage}`;
+
+    // Clear cart before/after opening messenger
+    onPlaceOrder();
 
     window.open(messengerUrl, '_blank');
   };

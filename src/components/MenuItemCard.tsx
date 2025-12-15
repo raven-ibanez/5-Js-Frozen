@@ -23,11 +23,11 @@ const MenuItemCard: React.FC<MenuItemCardProps> = ({
   const [modalQuantity, setModalQuantity] = useState(1);
 
   const calculatePrice = () => {
-    // Use effective price (discounted or regular) as base
-    let price = item.effectivePrice || item.basePrice;
-    if (selectedVariation) {
-      price = (item.effectivePrice || item.basePrice) + selectedVariation.price;
-    }
+    // Use variation price if selected, otherwise effective/base price
+    let price = selectedVariation
+      ? selectedVariation.price
+      : (item.effectivePrice || item.basePrice);
+
     selectedAddOns.forEach(addOn => {
       price += addOn.price * addOn.quantity;
     });
@@ -298,7 +298,7 @@ const MenuItemCard: React.FC<MenuItemCardProps> = ({
                           <span className="font-medium text-gray-900">{variation.name}</span>
                         </div>
                         <span className="text-gray-900 font-semibold">
-                          ₱{((item.effectivePrice || item.basePrice) + variation.price).toFixed(2)}
+                          ₱{variation.price.toFixed(2)}
                         </span>
                       </label>
                     ))}

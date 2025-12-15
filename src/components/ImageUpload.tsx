@@ -6,12 +6,14 @@ interface ImageUploadProps {
   currentImage?: string;
   onImageChange: (imageUrl: string | undefined) => void;
   className?: string;
+  label?: string;
 }
 
-const ImageUpload: React.FC<ImageUploadProps> = ({ 
-  currentImage, 
-  onImageChange, 
-  className = '' 
+const ImageUpload: React.FC<ImageUploadProps> = ({
+  currentImage,
+  onImageChange,
+  className = '',
+  label = 'Menu Item Image'
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { uploadImage, deleteImage, uploading, uploadProgress } = useImageUpload();
@@ -52,8 +54,8 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
 
   return (
     <div className={`space-y-4 ${className}`}>
-      <label className="block text-sm font-medium text-black mb-2">Menu Item Image</label>
-      
+      <label className="block text-sm font-medium text-black mb-2">{label}</label>
+
       {currentImage ? (
         <div className="relative">
           <img
@@ -89,7 +91,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-black mx-auto mb-2"></div>
               <p className="text-sm text-gray-600">Uploading... {uploadProgress}%</p>
               <div className="w-32 bg-gray-200 rounded-full h-2 mt-2">
-                <div 
+                <div
                   className="bg-black h-2 rounded-full transition-all duration-300"
                   style={{ width: `${uploadProgress}%` }}
                 ></div>

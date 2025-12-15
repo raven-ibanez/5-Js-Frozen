@@ -49,8 +49,19 @@ const MenuSection: React.FC<MenuSectionProps> = ({
                                 : 'bg-white text-gray-600 border border-gray-200 hover:border-meat-red hover:shadow-md'
                                 }`}
                         >
-                            <span className={`text-4xl transition-transform duration-300 ${activeSubcategory === sub.id ? 'scale-110' : 'group-hover:scale-110'
-                                }`}>{sub.icon}</span>
+                            {sub.image_url ? (
+                                <div className={`w-16 h-16 rounded-full overflow-hidden transition-transform duration-300 ${activeSubcategory === sub.id ? 'scale-110' : 'group-hover:scale-110'
+                                    }`}>
+                                    <img
+                                        src={sub.image_url}
+                                        alt={sub.name}
+                                        className="w-full h-full object-cover"
+                                    />
+                                </div>
+                            ) : (
+                                <span className={`text-4xl transition-transform duration-300 ${activeSubcategory === sub.id ? 'scale-110' : 'group-hover:scale-110'
+                                    }`}>{sub.icon}</span>
+                            )}
                             <span className={`text-lg font-bold font-display ${activeSubcategory === sub.id ? 'text-white' : 'text-gray-800 group-hover:text-meat-red'
                                 }`}>{sub.name}</span>
                         </button>

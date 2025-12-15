@@ -5,6 +5,7 @@ export interface Category {
   id: string;
   name: string;
   icon: string;
+  image_url?: string | null;
   sort_order: number;
   active: boolean;
   parent_id?: string | null;
@@ -53,6 +54,10 @@ export const useCategories = () => {
         dbCategory.parent_id = category.parent_id;
       }
 
+      if (category.image_url) {
+        dbCategory.image_url = category.image_url;
+      }
+
       const { data, error: insertError } = await supabase
         .from('categories')
         .insert(dbCategory)
@@ -74,6 +79,7 @@ export const useCategories = () => {
       const dbUpdates: any = {};
       if (updates.name !== undefined) dbUpdates.name = updates.name;
       if (updates.icon !== undefined) dbUpdates.icon = updates.icon;
+      if (updates.image_url !== undefined) dbUpdates.image_url = updates.image_url;
       if (updates.sort_order !== undefined) dbUpdates.sort_order = updates.sort_order;
       if (updates.active !== undefined) dbUpdates.active = updates.active;
       if (updates.parent_id !== undefined) dbUpdates.parent_id = updates.parent_id;

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Plus, Edit, Trash2, Save, X, ArrowLeft, GripVertical } from 'lucide-react';
 import { useCategories, Category } from '../hooks/useCategories';
+import ImageUpload from './ImageUpload';
 
 interface CategoryManagerProps {
   onBack: () => void;
@@ -14,6 +15,7 @@ const CategoryManager: React.FC<CategoryManagerProps> = ({ onBack }) => {
     id: '',
     name: '',
     icon: '☕',
+    image_url: '',
     sort_order: 0,
     active: true,
     parent_id: ''
@@ -25,6 +27,7 @@ const CategoryManager: React.FC<CategoryManagerProps> = ({ onBack }) => {
       id: '',
       name: '',
       icon: '☕',
+      image_url: '',
       sort_order: nextSortOrder,
       active: true,
       parent_id: ''
@@ -38,6 +41,7 @@ const CategoryManager: React.FC<CategoryManagerProps> = ({ onBack }) => {
       id: category.id,
       name: category.name,
       icon: category.icon,
+      image_url: category.image_url || '',
       sort_order: category.sort_order,
       active: category.active,
       parent_id: category.parent_id || ''
@@ -73,6 +77,9 @@ const CategoryManager: React.FC<CategoryManagerProps> = ({ onBack }) => {
       const payload: any = { ...formData };
       if (payload.parent_id === '') {
         payload.parent_id = null;
+      }
+      if (payload.image_url === '') {
+        payload.image_url = null;
       }
 
       if (editingCategory) {
@@ -204,7 +211,7 @@ const CategoryManager: React.FC<CategoryManagerProps> = ({ onBack }) => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-black mb-2">Icon *</label>
+                <label className="block text-sm font-medium text-black mb-2">Icon (Emoji)</label>
                 <div className="flex items-center space-x-3">
                   <input
                     type="text"
@@ -220,6 +227,14 @@ const CategoryManager: React.FC<CategoryManagerProps> = ({ onBack }) => {
                 <p className="text-xs text-gray-500 mt-1">
                   Use an emoji or icon character (e.g., ☕, 🧊, 🫖, 🥐)
                 </p>
+              </div>
+
+              <div className="mb-6">
+                <ImageUpload
+                  label="Image (Optional - Replaces Emoji)"
+                  currentImage={formData.image_url || undefined}
+                  onImageChange={(url) => setFormData({ ...formData, image_url: url || '' })}
+                />
               </div>
 
               <div>
