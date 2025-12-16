@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Trash2, Plus, Edit2, LogOut, Package, Grid, Settings, ArrowLeft, X, Save, Edit, Coffee, TrendingUp, Users, FolderOpen, CreditCard, Map, Lock } from 'lucide-react';
+import { Trash2, Plus, Package, Settings, ArrowLeft, X, Save, Edit, Coffee, TrendingUp, Users, FolderOpen, CreditCard, Map, Lock, Search, Filter } from 'lucide-react';
 import { MenuItem, Variation, AddOn } from '../types';
 import { useMenu } from '../hooks/useMenu';
 import { useCategories } from '../hooks/useCategories';
@@ -72,6 +72,10 @@ const AdminDashboard: React.FC = () => {
   });
   const [discountType, setDiscountType] = useState<'fixed' | 'percentage' | 'amount'>('fixed');
   const [discountValue, setDiscountValue] = useState<string>('');
+
+  // Search and Filter State
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterCategory, setFilterCategory] = useState('all');
 
   const addOnCategories = [
     { id: 'size', name: 'Size' },
@@ -214,16 +218,6 @@ const AdminDashboard: React.FC = () => {
     );
   };
 
-  const handleSelectAll = () => {
-    if (selectedItems.length === menuItems.length) {
-      setSelectedItems([]);
-      setShowBulkActions(false);
-    } else {
-      setSelectedItems(menuItems.map(item => item.id));
-      setShowBulkActions(true);
-    }
-  };
-
   // Update bulk actions visibility when selection changes
   React.useEffect(() => {
     setShowBulkActions(selectedItems.length > 0);
@@ -284,6 +278,15 @@ const AdminDashboard: React.FC = () => {
     ...cat,
     count: menuItems.filter(item => item.category === cat.id).length
   }));
+
+  // Filter menu items
+  const filteredMenuItems = menuItems.filter(item => {
+    const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.description.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = filterCategory === 'all' || item.category === filterCategory;
+
+    return matchesSearch && matchesCategory;
+  });
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -787,6 +790,37 @@ const AdminDashboard: React.FC = () => {
         </div>
 
         <div className="max-w-7xl mx-auto px-4 py-8">
+          {/* Search and Filter Controls */}
+          <div className="bg-white rounded-xl shadow-sm p-4 mb-6">
+            <div className="flex flex-col md:flex-row gap-4">
+              <div className="flex-1 relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Search items by name or description..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                />
+              </div>
+              <div className="md:w-64">
+                <div className="relative">
+                  <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                  <select
+                    value={filterCategory}
+                    onChange={(e) => setFilterCategory(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent appearance-none"
+                  >
+                    <option value="all">All Categories</option>
+                    {categories.map(cat => (
+                      <option key={cat.id} value={cat.id}>{cat.name}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* Bulk Actions Panel */}
           {showBulkActions && selectedItems.length > 0 && (
             <div className="bg-white rounded-xl shadow-sm p-6 mb-6 border-l-4 border-blue-500">
@@ -847,19 +881,25 @@ const AdminDashboard: React.FC = () => {
 
           <div className="bg-white rounded-xl shadow-sm overflow-hidden">
             {/* Bulk Actions Bar */}
-            {menuItems.length > 0 && (
+            {filteredMenuItems.length > 0 && (
               <div className="bg-gray-50 border-b border-gray-200 px-6 py-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-4">
                     <label className="flex items-center space-x-2">
                       <input
                         type="checkbox"
-                        checked={selectedItems.length === menuItems.length && menuItems.length > 0}
-                        onChange={handleSelectAll}
+                        checked={selectedItems.length === filteredMenuItems.length && filteredMenuItems.length > 0}
+                        onChange={() => {
+                          if (selectedItems.length === filteredMenuItems.length) {
+                            setSelectedItems([]);
+                          } else {
+                            setSelectedItems(filteredMenuItems.map(item => item.id));
+                          }
+                        }}
                         className="rounded border-gray-300 text-green-600 focus:ring-green-500"
                       />
                       <span className="text-sm font-medium text-gray-700">
-                        Select All ({menuItems.length} items)
+                        Select All ({filteredMenuItems.length} items)
                       </span>
                     </label>
                   </div>
@@ -898,7 +938,7 @@ const AdminDashboard: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                  {menuItems.map((item) => (
+                  {filteredMenuItems.map((item) => (
                     <tr key={item.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4">
                         <input
@@ -976,7 +1016,7 @@ const AdminDashboard: React.FC = () => {
 
             {/* Mobile Card View */}
             <div className="md:hidden">
-              {menuItems.map((item) => (
+              {filteredMenuItems.map((item) => (
                 <div key={item.id} className={`p - 4 border - b border - gray - 200 last: border - b - 0 ${selectedItems.includes(item.id) ? 'bg-blue-50' : ''} `}>
                   <div className="flex items-center justify-between mb-3">
                     <label className="flex items-center space-x-2">
