@@ -2,13 +2,14 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, useSearchParams } from 'react-router-dom';
 import { useCart } from './hooks/useCart';
 import Header from './components/Header';
-import Hero from './components/Hero';
+
 import Menu from './components/Menu';
 import Cart from './components/Cart';
 import Checkout from './components/Checkout';
 import FloatingCartButton from './components/FloatingCartButton';
 import AdminDashboard from './components/AdminDashboard';
 import LandingPage from './components/LandingPage';
+import CategoryView from './components/CategoryView';
 import { useMenu } from './hooks/useMenu';
 import { useCategories } from './hooks/useCategories';
 
@@ -17,8 +18,9 @@ function MainApp() {
   const cart = useCart();
   const { menuItems } = useMenu();
   const { categories } = useCategories();
-  const [currentView, setCurrentView] = React.useState<'menu' | 'cart' | 'checkout'>('menu');
+  const [currentView, setCurrentView] = React.useState<'menu' | 'cart' | 'checkout' | 'category'>('menu');
   const [selectedCategory, setSelectedCategory] = React.useState<string>('all');
+  const [selectedCategoryViewId, setSelectedCategoryViewId] = React.useState<string | null>(null);
 
   // Initialize from URL params
   React.useEffect(() => {
@@ -33,7 +35,7 @@ function MainApp() {
     }
   }, [searchParams]);
 
-  const handleViewChange = (view: 'menu' | 'cart' | 'checkout') => {
+  const handleViewChange = (view: 'menu' | 'cart' | 'checkout' | 'category') => {
     setCurrentView(view);
   };
 
@@ -48,6 +50,11 @@ function MainApp() {
       .filter(c => c.parent_id === selectedCategory)
       .map(c => c.id);
 
+    // If viewing a specific subcategory page
+    if (currentView === 'category' && selectedCategoryViewId) {
+      return menuItems.filter(item => item.category === selectedCategoryViewId);
+    }
+
     return menuItems.filter(item =>
       item.category === selectedCategory || subcategoryIds.includes(item.category)
     );
@@ -61,16 +68,32 @@ function MainApp() {
         onMenuClick={() => handleViewChange('menu')}
       />
 
-      {/* Show Hero only in menu view */}
-      {currentView === 'menu' && <Hero />}
+      {/* Show Hero only in menu view - REMOVED */}
+      {/* {currentView === 'menu' && <Hero />} */}
 
 
       {currentView === 'menu' && (
         <Menu
           menuItems={filteredMenuItems}
-          addToCart={cart.addToCart}
+          onSubcategoryClick={(id) => {
+            setSelectedCategoryViewId(id);
+            handleViewChange('category');
+            window.scrollTo(0, 0);
+          }}
+        />
+      )}
+
+      {currentView === 'category' && selectedCategoryViewId && (
+        <CategoryView
+          categoryId={selectedCategoryViewId}
+          items={filteredMenuItems}
           cartItems={cart.cartItems}
+          addToCart={cart.addToCart}
           updateQuantity={cart.updateQuantity}
+          onBack={() => {
+            handleViewChange('menu');
+            setSelectedCategoryViewId(null);
+          }}
         />
       )}
 

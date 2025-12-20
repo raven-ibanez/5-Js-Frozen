@@ -1,5 +1,5 @@
 import React from 'react';
-import { MenuItem, CartItem } from '../types';
+import { MenuItem } from '../types';
 import { useCategories } from '../hooks/useCategories';
 import MenuSection from './MenuSection';
 
@@ -16,12 +16,10 @@ const preloadImages = (items: MenuItem[]) => {
 
 interface MenuProps {
   menuItems: MenuItem[];
-  addToCart: (item: MenuItem, quantity?: number, variation?: any, addOns?: any[]) => void;
-  cartItems: CartItem[];
-  updateQuantity: (id: string, quantity: number) => void;
+  onSubcategoryClick: (id: string) => void;
 }
 
-const Menu: React.FC<MenuProps> = ({ menuItems, addToCart, cartItems, updateQuantity }) => {
+const Menu: React.FC<MenuProps> = ({ menuItems, onSubcategoryClick }) => {
   const { categories } = useCategories();
   const [activeCategory, setActiveCategory] = React.useState('hot-coffee');
 
@@ -102,9 +100,7 @@ const Menu: React.FC<MenuProps> = ({ menuItems, addToCart, cartItems, updateQuan
                 category={category}
                 subcategories={subcategories}
                 items={allCategoryItems}
-                cartItems={cartItems}
-                addToCart={addToCart}
-                updateQuantity={updateQuantity}
+                onSubcategoryClick={onSubcategoryClick}
               />
             );
           })}

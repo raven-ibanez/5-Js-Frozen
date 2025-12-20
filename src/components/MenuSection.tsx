@@ -1,31 +1,28 @@
-import React, { useState } from 'react';
-import { MenuItem, CartItem } from '../types';
+import React from 'react';
+import { MenuItem } from '../types';
 import { Category } from '../hooks/useCategories';
-import MenuItemCard from './MenuItemCard';
+
 
 interface MenuSectionProps {
     category: Category;
     subcategories: Category[];
     items: MenuItem[];
-    cartItems: CartItem[];
-    addToCart: (item: MenuItem, quantity?: number, variation?: any, addOns?: any[]) => void;
-    updateQuantity: (id: string, quantity: number) => void;
+    onSubcategoryClick: (id: string) => void;
 }
 
 const MenuSection: React.FC<MenuSectionProps> = ({
     category,
     subcategories,
     items,
-    cartItems,
-    addToCart,
-    updateQuantity
+    onSubcategoryClick
 }) => {
-    const [activeSubcategory, setActiveSubcategory] = useState<string | null>(null);
+    // Local state removed in favor of parent navigation
+    // const [activeSubcategory, setActiveSubcategory] = useState<string | null>(null);
 
-    // Filter items based on active subcategory
-    const displayedItems = activeSubcategory
-        ? items.filter(item => item.category === activeSubcategory)
-        : [];
+    // Filter items based on active subcategory - Logic moved to CategoryView
+    // const displayedItems = activeSubcategory
+    //     ? items.filter(item => item.category === activeSubcategory)
+    //     : [];
 
     // Always render structure if we have subcategories, even if no items shown yet
     if (items.length === 0 && subcategories.length === 0) return null;
@@ -43,15 +40,11 @@ const MenuSection: React.FC<MenuSectionProps> = ({
                     {subcategories.map(sub => (
                         <button
                             key={sub.id}
-                            onClick={() => setActiveSubcategory(sub.id)}
-                            className={`p-6 rounded-2xl transition-all duration-200 flex flex-col items-center justify-center gap-3 group ${activeSubcategory === sub.id
-                                ? 'bg-meat-red text-white shadow-lg scale-105'
-                                : 'bg-white text-gray-600 border border-gray-200 hover:border-meat-red hover:shadow-md'
-                                }`}
+                            onClick={() => onSubcategoryClick(sub.id)}
+                            className="p-6 rounded-2xl transition-all duration-200 flex flex-col items-center justify-center gap-3 group bg-white text-gray-600 border border-gray-200 hover:border-meat-red hover:shadow-md"
                         >
                             {sub.image_url ? (
-                                <div className={`w-16 h-16 rounded-full overflow-hidden transition-transform duration-300 ${activeSubcategory === sub.id ? 'scale-110' : 'group-hover:scale-110'
-                                    }`}>
+                                <div className="w-16 h-16 rounded-full overflow-hidden transition-transform duration-300 group-hover:scale-110">
                                     <img
                                         src={sub.image_url}
                                         alt={sub.name}
@@ -59,31 +52,13 @@ const MenuSection: React.FC<MenuSectionProps> = ({
                                     />
                                 </div>
                             ) : (
-                                <span className={`text-4xl transition-transform duration-300 ${activeSubcategory === sub.id ? 'scale-110' : 'group-hover:scale-110'
-                                    }`}>{sub.icon}</span>
+                                <span className="text-4xl transition-transform duration-300 group-hover:scale-110">{sub.icon}</span>
                             )}
-                            <span className={`text-lg font-bold font-display ${activeSubcategory === sub.id ? 'text-white' : 'text-gray-800 group-hover:text-meat-red'
-                                }`}>{sub.name}</span>
+                            <span className="text-lg font-bold font-display text-gray-800 group-hover:text-meat-red">{sub.name}</span>
                         </button>
                     ))}
                 </div>
             )}
-
-            {/* Items Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {displayedItems.map((item) => {
-                    const cartItem = cartItems.find(cartItem => cartItem.id === item.id);
-                    return (
-                        <MenuItemCard
-                            key={item.id}
-                            item={item}
-                            onAddToCart={addToCart}
-                            quantity={cartItem?.quantity || 0}
-                            onUpdateQuantity={updateQuantity}
-                        />
-                    );
-                })}
-            </div>
         </section>
     );
 };
