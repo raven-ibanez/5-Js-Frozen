@@ -58,7 +58,7 @@ function MainApp() {
     return menuItems.filter(item =>
       item.category === selectedCategory || subcategoryIds.includes(item.category)
     );
-  }, [selectedCategory, menuItems, categories]);
+  }, [selectedCategory, menuItems, categories, currentView, selectedCategoryViewId]);
 
   return (
     <div className="min-h-screen bg-meat-light font-sans">
